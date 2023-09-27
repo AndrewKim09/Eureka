@@ -1,11 +1,14 @@
 import React from 'react'
 import { auth, provider} from './firebase';
-import { signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, sendEmailVerification, signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { validate, res } from 'react-email-validator';
+import { validate} from 'react-email-validator';
 import { useState } from 'react';
-import { set, useForm } from 'react-hook-form';
-import { Navigate } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { doc } from 'firebase/firestore';
+import { db } from './firebase';
+import { setDoc } from 'firebase/firestore';
+import { EmailVerify } from './EmailVerify';
 
 export const SignUp = ({setEmailPassword}) => {
     const navigate = useNavigate();
@@ -18,22 +21,35 @@ export const SignUp = ({setEmailPassword}) => {
     const [confirmEmailError, setConfirmEmailError] = useState("");
     const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
+    const [verifying, setVerifying] = useState(false)
 
-    const { handleSubmit, formState: { errors } } = useForm();
+    const auth = getAuth();
 
-
-
-
-
+    let result;
 
 
-  const signInWithGoogle = async () =>{
-    const result = await signInWithPopup(auth, provider);
-    navigate("/SignUpPt2");
-    window.location.reload();
-  };
+    const signInWithGoogle = async () => {
+        try {
+          const result = await signInWithPopup(auth, provider);
+          
+          const user = result.user;
+    
+          await sendEmailVerification(user);
+    
+          // Update user's email verification status
+          await auth.updateCurrentUser({
+            emailVerified: false,
+          });
+          
+    
+          window.location.reload();
+          
+        } catch (error) {
+          console.log(error);
+        }
+      };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     setEmailError("");
     setPasswordError("");
     setConfirmEmailError("");
@@ -43,8 +59,33 @@ export const SignUp = ({setEmailPassword}) => {
         if(email === confirmEmail){
             if(password.length > 6){
                 if(password === confirmPassword){
-                    setEmailPassword([email, password]);
-                    navigate("/SignUpPt2"); 
+                    try{
+                        const newUserCredentials = await createUserWithEmailAndPassword(auth, email, password)
+
+                        const userProfileDocRef = doc(db, `users/${newUserCredentials.user.uid}`)
+
+                        await setDoc(userProfileDocRef, {email})
+                        
+                        await sendEmailVerification(newUserCredentials.user)
+                        
+                        auth.updateCurrentUser(newUserCredentials.uid , {
+                            emailVerified: false
+                        })
+                        
+                        
+
+                        setVerifying(true)
+                    }
+                    catch(e){  
+                        
+                        if(e.code === 'auth/email-already-in-use'){
+                            setEmailError("this email already exists!")
+                        }
+                        else{
+                            alert(e)
+                        }
+                        
+                    }
                 }
                 else{
                     setConfirmPasswordError("Passwords do not match");
@@ -66,7 +107,8 @@ export const SignUp = ({setEmailPassword}) => {
 
   return (
     <div class = "w-[100%] h-[100%] bg-blue ">
-        <div class = "flex flex-col border w-[600px] m-auto border-black my-[50px] shadow-xl rounded-md bg-[#d1fae5] h-[700px]">
+        { !verifying ? 
+            <div class = "flex flex-col border w-[600px] m-auto border-black my-[50px] shadow-xl rounded-md bg-[#d1fae5] h-[700px]">
 
             <div class = "flex flex-col items-center mx-auto border border-b-[#47cc90] h-[70%] w-[100%] pb-5">
                 <div class = "flex flex-col mt-6 w-[70%]">
@@ -80,7 +122,7 @@ export const SignUp = ({setEmailPassword}) => {
 
                 <div class = "flex flex-col mt-6 w-[70%]">
                     <div class = "flex">
-                        <label class = "font-bold" id = "confirmEmail">Email</label>
+                        <label class = "font-bold" id = "confirmEmail">Confirm Email</label>
                         <p class = "ml-6 text-red-700">{confirmEmailError}</p>
                     </div>
                     
@@ -119,6 +161,12 @@ export const SignUp = ({setEmailPassword}) => {
 
 
         </div>
+        
+        :
+        <div>
+            {navigate("/emailVerify")}
+        </div>
+    }
 
     </div>
   )

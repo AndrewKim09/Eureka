@@ -1,22 +1,55 @@
 import React from 'react'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { db, auth } from './firebase';
+import { addDoc, collection, doc, getDoc } from 'firebase/firestore';
+import { query, where } from 'firebase/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 export const SignUpPt2 = ({emailPassword, setEmailPassword}) => {
     const [studentNumber, setStudentNumber] = useState("");
-    const [typeOfUser, setTypeOfUser] = useState("");
+    const [typeOfUser, setTypeOfUser] = useState("Student");
+    const [email, setEmail] = useState();
+    const [username] = useAuthState(auth);
     const navigate = useNavigate();
 
+    if(!username.emailVerified){
+        navigate("/EmailVerify");
+    }
     
-    const onSubmit = () => {
-        setEmailPassword([emailPassword[0], emailPassword[1], studentNumber, typeOfUser]);
+    let accountsRef;
+
+    const q = query(collection(db, "users"), where("email", "==", emailPassword[0]));
+
+
+
+    
+    const onSubmit = async () => {
+
         
-        navigate("/SignUpPt2");
+
+        if(typeOfUser === "Student"){
+            accountsRef = collection(db, "Students")
+        }
+        else{
+            accountsRef = (collection(db, "Teachers"))
+        }
+
+        console.log(accountsRef)
+        console.log(db);
+
+        await addDoc(accountsRef, {
+            email: emailPassword[0],
+            typeOfUser,
+            studentNumber,
+        })
+        
+        navigate("/Home");
     }
     
   return (
     <div class = "w-[100%] h-[100%] bg-blue ">
-        <div>extra info</div>
+       
         
         <div class = "flex flex-col border w-[600px] m-auto border-black my-[50px] shadow-xl rounded-md bg-[#d1fae5] h-[400px]">
 

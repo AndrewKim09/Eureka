@@ -1,4 +1,4 @@
-
+import React, { useEffect } from 'react';
 import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import {Navigate} from 'react-router-dom';
 import { NavBar } from './components/NavBar';
@@ -8,29 +8,68 @@ import { SignUp } from './components/SignUp';
 import { set } from 'react-hook-form';
 import { useState } from 'react';
 import { SignUpPt2 } from './components/SignUpPt2';
+import { Error } from './components/Error';
+import { HomeAfterLogIn } from './components/HomeAfterLogIn';
+import { auth, db } from './components/firebase';
+import {useAuthState }from 'react-firebase-hooks/auth';
+import { EmailVerify } from './components/EmailVerify';
+import { createContext } from 'react';
+import { query, where } from 'firebase/firestore';
+import { getDocs, collection } from 'firebase/firestore';
+
+export const userContext = React.createContext();
 
 function App() {
   const [emailPassword, setEmailPassword] = useState([]);
+  const [username] = useAuthState(auth);
+  let studentQuerySnapshot;
+  let teacherQuerySnapshot;
+  let userQuerySnapshot;
+  let userType;
+
+
+  const getQuery = async () => {
+    if(username){
+      studentQuerySnapshot = await getDocs(query(collection(db, "Students"), where("email", "==", username.email)));
+      teacherQuerySnapshot = await getDocs(query(collection(db, "Teachers"), where("email", "==", username.email)));
+      
+      if(studentQuerySnapshot.size == 1){
+        userType = "Student";
+        console.log("gap")
+        console.log(userType)
+        return studentQuerySnapshot;
+      }
+      else{
+        userType = "Teacher";
+        console.log("gap")
+        console.log(userType)
+        return teacherQuerySnapshot;
+        
+      }
+    }
+  }
+
+
 
   return (
     <div className="z-0 App">
-      <Router>
-        <NavBar/>
-        <Routes>
+      <userContext.Provider value = {{username, userQuerySnapshot, getQuery, userType}}>
+        <Router>
+          <NavBar userType = {userType}/>
+          <Routes>
+        
+            <Route path="/" element={<Home/>} /> 
+            <Route path="/SignUp" element={<SignUp setEmailPassword={setEmailPassword}/>} />
+            <Route path="/SignUpPt2" element={<SignUpPt2 emailPassword={emailPassword} setEmailPassword={setEmailPassword}/>} />
+            <Route path="/Home" element={<HomeAfterLogIn/>} />
+            <Route path = "/login" element={<Login emailPassword={emailPassword} setEmailPassword={setEmailPassword}/>}/>
+            <Route path = "emailverify" element={<EmailVerify/>}/>
 
-          <Route path="/" element={<Navigate to="/Home"/>} /> 
-          <Route path="/SignUp" element={<SignUp setEmailPassword={setEmailPassword}/>} />
-          <Route path="/SignUpPt2" element={<SignUpPt2 emailPassword={emailPassword} setEmailPassword={setEmailPassword}/>} />
-          <Route path="/Home" element={<Home/>} />
-          <Route path = "/login" element={<Login/>}/>
-          
-
-        </Routes>
-      </Router>
+          </Routes>
+        </Router>
+      </userContext.Provider>
     </div>
   );
 }
 
 export default App;
-//q: why is my Login component not rendering?
-//a: I was using component instead of element in the Route tag
