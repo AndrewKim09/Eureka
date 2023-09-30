@@ -22,10 +22,11 @@ export const userContext = React.createContext();
 function App() {
   const [emailPassword, setEmailPassword] = useState([]);
   const [username] = useAuthState(auth);
+  const [signedIn, setSignedIn] = useState(false);
+  const [userQuerySnapshot, setUserQuerySnapshot] = useState(null);
+  const [userType, setUserType] = useState(null);
   let studentQuerySnapshot;
   let teacherQuerySnapshot;
-  let userQuerySnapshot;
-  let userType;
 
 
   const getQuery = async () => {
@@ -34,16 +35,12 @@ function App() {
       teacherQuerySnapshot = await getDocs(query(collection(db, "Teachers"), where("email", "==", username.email)));
       
       if(studentQuerySnapshot.size == 1){
-        userType = "Student";
-        console.log("gap")
-        console.log(userType)
-        return studentQuerySnapshot;
+        setUserType("Student");
+        setUserQuerySnapshot(studentQuerySnapshot);
       }
       else{
-        userType = "Teacher";
-        console.log("gap")
-        console.log(userType)
-        return teacherQuerySnapshot;
+        setUserType("Teacher");
+        setUserQuerySnapshot(teacherQuerySnapshot);
         
       }
     }
@@ -51,14 +48,16 @@ function App() {
 
 
 
+
   return (
     <div className="z-0 App">
-      <userContext.Provider value = {{username, userQuerySnapshot, getQuery, userType}}>
+      <userContext.Provider value = {{username, userQuerySnapshot, getQuery, userType, signedIn, setSignedIn}}>
         <Router>
           <NavBar userType = {userType}/>
           <Routes>
+            
         
-            <Route path="/" element={<Home/>} /> 
+            <Route path="/" element={ <Home/>} /> 
             <Route path="/SignUp" element={<SignUp setEmailPassword={setEmailPassword}/>} />
             <Route path="/SignUpPt2" element={<SignUpPt2 emailPassword={emailPassword} setEmailPassword={setEmailPassword}/>} />
             <Route path="/Home" element={<HomeAfterLogIn/>} />

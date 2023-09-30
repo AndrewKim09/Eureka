@@ -12,23 +12,25 @@ import { useContext } from '../App';
 import { userContext } from '../App';
 
 export const Login = ({emailPassword, setEmailPassword}) => {
-  const {getQuery} = React.useContext(userContext);
-  let userQuerySnapshot;
+  const {setSignedIn} = React.useContext(userContext);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
+  const {userQuerySnapshot} = React.useContext(userContext);
+  const {getQuery} = React.useContext(userContext);
 
   const checkData = async (email) => {
     try {
-      userQuerySnapshot = await getQuery();
+      await getQuery();
       console.log(userQuerySnapshot);
       
       if (userQuerySnapshot.size === 1) {
         if(userQuerySnapshot.docs[0].data().hasOwnProperty("studentNumber") || userQuerySnapshot.docs[0].data().hasOwnProperty("teacherNumber")){
 
         console.log("User with email with additional data");
+        setSignedIn(true)
         navigate("/Home");
         } 
         else{
@@ -60,7 +62,7 @@ export const Login = ({emailPassword, setEmailPassword}) => {
       checkData(user.email)
       console.log(auth.currentUser)
       console.log(auth.currentUser.emailVerified);
-
+      
     
   };
 
