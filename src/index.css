@@ -29,6 +29,12 @@ code {
     monospace;
 }
 
+label{
+  display: block;
+  padding-top: 70px;
+
+}
+
 .login-button{
   width: 140px;
   height: 40px;
@@ -43,4 +49,8 @@ code {
   border-color:rgb(170, 170, 170);
   
 
+}
+
+input[type="submit"] {
+  cursor: pointer
 }

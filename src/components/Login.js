@@ -1,37 +1,42 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useState } from 'react'
 import { auth, provider, db} from './firebase';
-import { reload, signInWithPopup } from 'firebase/auth';
+import {signInWithPopup } from 'firebase/auth';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { useAuthState } from 'react-firebase-hooks/auth';
-import { collection, where} from 'firebase/firestore';
-import { getDocs } from 'firebase/firestore';
-import { query } from 'firebase/firestore';
-import { useContext } from '../App';
-import { userContext } from '../App';
 
-export const Login = ({emailPassword, setEmailPassword}) => {
+import { userContext } from '../App';
+import { wait } from '@testing-library/user-event/dist/utils';
+import { useEffect } from 'react';
+
+export const Login = ({setEmailPassword}) => {
   const {setSignedIn} = React.useContext(userContext);
+  const {getQuery} = React.useContext(userContext);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
-  const {userQuerySnapshot} = React.useContext(userContext);
-  const {getQuery} = React.useContext(userContext);
+  const[ userQuerySnapshot, setUserQuerySnapshot] = useState(null);
 
+  
   const checkData = async (email) => {
     try {
-      await getQuery();
-      console.log(userQuerySnapshot);
-      
-      if (userQuerySnapshot.size === 1) {
-        if(userQuerySnapshot.docs[0].data().hasOwnProperty("studentNumber") || userQuerySnapshot.docs[0].data().hasOwnProperty("teacherNumber")){
 
-        console.log("User with email with additional data");
+      await setUserQuerySnapshot(await getQuery(email))
+
+      
+    } catch (error) {
+      console.error("Error signing in with Google:", error)
+    }
+  }
+
+  useEffect(() => {
+    if(userQuerySnapshot){
+      if ( userQuerySnapshot.size === 1) {
+        if(userQuerySnapshot.docs[0].data().hasOwnProperty("studentNumber") || userQuerySnapshot.docs[0].data().hasOwnProperty("teacherNumber")){
         setSignedIn(true)
-        navigate("/Home");
+        navigate("/");
         } 
         else{
 
@@ -40,16 +45,15 @@ export const Login = ({emailPassword, setEmailPassword}) => {
         }
       }
       else if (userQuerySnapshot.size > 1) {
-        console.log("Error: Multiple users exist with the same email address:");
+
       }
       else {
-        console.log(userQuerySnapshot.docs[0].data());
+        setEmailError("this email is not registered or not verified")
+
         console.log("User with email does not exist:");
       }
-    } catch (error) {
-      console.error("Error signing in with Google:", error);
     }
-  }
+  }, [userQuerySnapshot]);
   
 
 
@@ -62,6 +66,7 @@ export const Login = ({emailPassword, setEmailPassword}) => {
       checkData(user.email)
       console.log(auth.currentUser)
       console.log(auth.currentUser.emailVerified);
+      navigate("/")
       
     
   };
@@ -69,7 +74,7 @@ export const Login = ({emailPassword, setEmailPassword}) => {
   const onSignIn = () => {
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        
+
         checkData(email);
 
 
@@ -106,14 +111,14 @@ export const Login = ({emailPassword, setEmailPassword}) => {
 
     <div class = "flex flex-col mt-6 w-[70%]">
         <div class = "flex">
-            <label class = "font-bold" id = "password">Password</label>
+            <label type = "hidden" class = "font-bold" id = "password">Password</label>
             <p class = "ml-6 text-red-700">{passwordError}</p>
         </div>
         
         <input class = "px-4 py-1 rounded-xl" placeholder='Password' onChange={(e) => {setPassword(e.target.value)}}></input>
     </div>
 
-    <button class = "mt-6 bg-[#AAF0D1] px-2 py-1 rounded-lg" onClick = {onSignIn}>Sign Up</button>
+    <button class = "mt-6 bg-[#AAF0D1] px-2 py-1 rounded-lg" onClick = {onSignIn}>Login</button>
 
 </div>
 
