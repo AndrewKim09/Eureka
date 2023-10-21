@@ -15,6 +15,8 @@ import { query, where } from 'firebase/firestore';
 import { getDocs, collection } from 'firebase/firestore';
 import { Create } from './components/Create';
 import { CreateTest } from './components/TestComponents/CreateTest';
+import {Class} from './components/Class';
+import { AddAssignment } from './components/AddAssignment';
 
 export const userContext = React.createContext();
 
@@ -36,13 +38,9 @@ function App() {
       
       
       if(studentQuerySnapshot.size == 1){
-        setUserQuerySnapshot(studentQuerySnapshot);
-        console.log(userQuerySnapshot)
         return(studentQuerySnapshot);
       }
       else if (teacherQuerySnapshot.size == 1){
-        setUserQuerySnapshot(teacherQuerySnapshot);
-        console.log(userQuerySnapshot)
         return(teacherQuerySnapshot);
         
       }
@@ -56,6 +54,10 @@ function App() {
     }
 
   }
+
+  useEffect(() => {
+
+  }, [userQuerySnapshot])
 
 
 
@@ -74,6 +76,8 @@ function App() {
             <Route path = "/login" element={<Login emailPassword={emailPassword} setEmailPassword={setEmailPassword}/>}/>
             <Route path = "emailverify" element={<EmailVerify/>}/>
             <Route path = "/create" element={<CreateTest/>}/>
+            <Route path = "/class/:classID/add" element={<AddAssignment/>}/>
+            <Route path = "/class/:classID" element={<Class userQuerySnapshot= {userQuerySnapshot}/>}/>
             <Route path = "*" element={<Error/>}/>
           </Routes>
         </Router>

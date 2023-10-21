@@ -41,7 +41,7 @@ export const CreateTest = () => {
         setClassNameError("");
         setClassImageError("");
 
-        if(className != ""){
+        if(className !== ""){
             if(classImage && isImage(classImage[0].name)){
             }
             else{
@@ -70,7 +70,7 @@ export const CreateTest = () => {
                 classImage: url,
                 season,
             })
-            navigate("/home")
+            navigate("/")
             
         })
         .catch((error) => {
@@ -86,8 +86,8 @@ export const CreateTest = () => {
     
         <form class = "flex flex-col w-[500px] h-[400px] items-center border-solid border-black border-2 m-auto mt-10 rounded-xl">
             <fieldset>
-                <label for = "className" class = "block"><p class = "block text-red-400 text-sm w-[100%] h-[20px]">{classNameError ? classNameError : " "}</p>Class Name: <input onChange={(event) => {setClassName(event.target.value)}} id = "className" class = "border-solid border-2 border-black"/></label>
-                <label for = "classImage"><p class = "block text-red-400 text-sm w-[100%] h-[20px]">{classImageError ? classImageError: " "}</p>Upload class image: <input onChange={(event) => {setClassImage((event.target.files))}} id = "classImage" type = "file" class = "text-xs"></input></label>
+                <label for = "className" class = "block"><p class = "error">{classNameError ? classNameError : " "}</p>Class Name: <input onChange={(event) => {setClassName(event.target.value)}} id = "className" class = "border-solid border-2 border-black"/></label>
+                <label for = "classImage"><p class = "error">{classImageError ? classImageError: " "}</p>Upload class image: <input onChange={(event) => {setClassImage((event.target.files))}} id = "classImage" type = "file" class = "text-xs"></input></label>
                 <label for = "season">Season <select id = "season" class = "border-solid border-black border-2" onChange={(event) => {setSeason(event.target.value)}}>
                     <option value = "Fall">Fall</option>
                     <option value = "Winter">Winter</option>
