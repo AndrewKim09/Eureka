@@ -12,12 +12,6 @@ export const CreateQuiz = ({titleError, setTitle, descriptionError, setDescripti
     const [choices, setChoices] = useState(1)
     const [numberOfQuestions, setNumberOfQuestions] = useState(1)
     const [questions, setQuestions] = useState([])
-    /*
-    const [answerCheck, setAnswerCheck] = useState(false);
-    const [emptyAnswerCheck, setEmptyAnswerCheck] = useState(false);
-    const [onload, setOnLoad] = useState(false)
-    const [changeError, setChangeError] = useState(false)
-    */
 
 
     const addChoice = () => {
@@ -39,11 +33,6 @@ export const CreateQuiz = ({titleError, setTitle, descriptionError, setDescripti
       const typeOfQuestionSelectorElement = document.getElementById("typeOfQuestionSelector")
       var answerCheck = false
       var emptyAnswerCheck = false
-
-      /*
-      setAnswerCheck(false)
-      setEmptyAnswerCheck(false)
-      */
 
       if(questionElement.value === ""){
         console.log("c")
@@ -102,27 +91,6 @@ export const CreateQuiz = ({titleError, setTitle, descriptionError, setDescripti
 
     }
 
-    /*
-
-    useEffect(() => {
-      if(onload){
-        if(!answerCheck){
-          setAnswerError("Please select a correct answer");
-          return
-        }
-
-        if(emptyAnswerCheck){
-          setAnswerError("Please fill in all answers");
-          return
-        }
-      }
-
-      setOnLoad(true)
-
-
-
-    },[changeError] )
-    */
     
 
       
