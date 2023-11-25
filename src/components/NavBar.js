@@ -29,7 +29,7 @@ export const NavBar = () => {
     }
 
   return (
-    <div class = "w-[100%] h-14 bg-[#86efac] flex items-center">
+    <div class = "left-0 right-0 h-14 bg-[#86efac] flex items-center fixed top-0 z-10">
 
         <div class = "text-center ml-5 font-bold text-lg">Eureka</div>
         
@@ -37,13 +37,13 @@ export const NavBar = () => {
             !username ? 
             <>
             
-            <button class = "text-center justify-self-end ml-auto mr-5 rounded md py-1 px-2 bg-white shadow-lg border"><Link to = "/signUp">Sign Up</Link></button>
-            <button class = "text-center justify-self-end mr-5 rounded-md py-1 px-2 bg-white shadow-lg border"><Link to = "/login">Login</Link></button>
+            <button class = "text-center justify-self-end ml-auto mr-5 rounded md py-1 px-2 bg-white shadow-lg border" onClick = {() => {navigate("/signUp")}}>Sign Up</button>
+            <button class = "text-center justify-self-end mr-5 rounded-md py-1 px-2 bg-white shadow-lg border" onClick = {() => {navigate("/login")}}>Login</button>
 
             </>
             :
             <>
-            <button class = "text-center justify-self-end ml-5 rounded md py-1 px-2 bg-white shadow-lg border"><Link to = "/">Classes</Link></button>
+            <button class = "text-center justify-self-end ml-5 rounded md py-1 px-2 bg-white shadow-lg border" onClick = {() => {navigate("/")}}>Classes</button>
             <button class = "text-center justify-self-end ml-auto mr-5 rounded md py-1 px-2 bg-white shadow-lg border" onClick={onLogOut}>Log out</button>
             </>
         }

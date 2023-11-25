@@ -7,6 +7,8 @@ import { query, where } from 'firebase/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 
 export const SignUpPt2 = ({emailPassword, setEmailPassword}) => {
+    const [name, setName] = useState("");
+    const [nameError, setNameError] = useState("");
     const [studentNumber, setStudentNumber] = useState("");
     const [typeOfUser, setTypeOfUser] = useState("Student");
     const [email, setEmail] = useState();
@@ -26,6 +28,11 @@ export const SignUpPt2 = ({emailPassword, setEmailPassword}) => {
     
     const onSubmit = async () => {
 
+        if(name === ""){
+            setNameError("Please enter a name")
+            return;
+        }
+
         
 
         if(typeOfUser === "Student"){
@@ -39,12 +46,13 @@ export const SignUpPt2 = ({emailPassword, setEmailPassword}) => {
         console.log(db);
 
         await addDoc(accountsRef, {
+            name,
             email: emailPassword[0],
             typeOfUser,
             studentNumber,
         })
         
-        navigate("/Home");
+        navigate("/");
     }
     
   return (
@@ -54,6 +62,17 @@ export const SignUpPt2 = ({emailPassword, setEmailPassword}) => {
         <div class = "flex flex-col border w-[600px] m-auto border-black my-[50px] shadow-xl rounded-md bg-[#d1fae5] h-[400px]">
 
             <div class = "flex flex-col items-center mx-auto h-[100%] w-[100%] pb-5">
+
+                <div class = "flex flex-col mt-6 w-[70%]">
+                    <div class = "flex">
+                        <label class = "font-bold" id = "name">Full Name</label>
+                        <p class = "ml-6 text-red-700">{nameError}</p>
+                    </div>
+                    
+                    <input class = "px-4 py-1 rounded-xl" onChange={(e) => {setName(e.target.value)}}></input>
+                </div>
+
+                
                 <div class = "flex flex-col mt-6 w-[70%]">
                     <div class = "flex">
                         <label class = "font-bold" id = "email">Student Number (if applicable)</label>

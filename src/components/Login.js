@@ -73,7 +73,7 @@ export const Login = ({setEmailPassword}) => {
 
   const onSignIn = () => {
     signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
+      .then(() => {
 
         checkData(email);
 
@@ -92,6 +92,20 @@ export const Login = ({setEmailPassword}) => {
         console.log(errorCode);
         console.log(errorMessage);
       });
+  }
+
+  const toggleVisible = (event) => {
+    var passwordInput = document.getElementById("passwordInput");
+    var checkBox = document.getElementById("checkBox");
+    if(event.target != checkBox){ 
+      checkBox.checked = !checkBox.checked;
+    }
+    if(passwordInput.type == "password"){
+      passwordInput.type = "text";
+    }
+    else{
+      passwordInput.type = "password";
+    }
   }
   return (
     <div class = "w-[100%] h-[100%] bg-blue">
@@ -115,7 +129,11 @@ export const Login = ({setEmailPassword}) => {
             <p class = "ml-6 text-red-700">{passwordError}</p>
         </div>
         
-        <input class = "px-4 py-1 rounded-xl" placeholder='Password' onChange={(e) => {setPassword(e.target.value)}}></input>
+        <input class = "px-4 py-1 rounded-xl"  id = "passwordInput" placeholder='Password' type = "password" onChange={(e) => {setPassword(e.target.value)}}></input>
+        <div class = "flex align-middle justify-center text-center" onClick={(event) => {toggleVisible(event)}}>
+          <input type="checkbox" id = "checkBox" ></input>
+          <label class = "justify-centre p-0">Show Password</label>
+        </div>
     </div>
 
     <button class = "mt-6 bg-[#AAF0D1] px-2 py-1 rounded-lg" onClick = {onSignIn}>Login</button>

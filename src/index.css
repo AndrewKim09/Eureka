@@ -1,6 +1,5 @@
 
 *{
-  
   margin: 0;
   padding: 0;
   scroll-behavior: smooth;
@@ -10,6 +9,7 @@
 html, body {
   background-color: "#e0ffff";
   height: 100%;
+  height: auto;
   width: auto
 }
 
@@ -71,12 +71,11 @@ label{
   cursor: pointer;
 }
 
-p[class="error"]{
+.error{
 
   display: block;
   color: red;
   font-size: 14px;
-  width: 100%;
   height: 20px;
 }
 
@@ -92,8 +91,22 @@ div[id="typeBox"]{
   border-color: rgb(12, 180, 12)
 }
 
+.loader {
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+  margin: auto;
+  margin-top: 100px
+}
 
-.deleteToggle{
-  background-color: red;
-  color: white;
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+input[type="password"]{
+  -webkit-text-security: disc;
 }

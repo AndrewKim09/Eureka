@@ -10,11 +10,13 @@ export const GetPosts = ({classID}) => {
     const [announcementsDocs, setAnnouncementsDocs] = useState(null);
     const [postsDocs, setPostsDocs] = useState(null);
     const [lecturesDocs, setLecturesDocs] = useState(null);
+    const [quizzes, setQuizzes] = useState(null);
+    const [quizzesDocs, setQuizzesDocs] = useState(null);
 
     const getAnnouncements = async () => {
 
         try{
-            await setAnnouncements(await getDocs(query(collection(db, `posts/${classID}/Announcement`), orderBy("date", "desc"))))
+            setAnnouncements(await getDocs(query(collection(db, `Classes/${classID}/Announcement`), orderBy("date", "desc"))))
         }
         catch(error){
             console.log("getAnnouncements Error: " + error)
@@ -23,7 +25,7 @@ export const GetPosts = ({classID}) => {
 
     const getPosts = async () => {
         try{
-            await setPosts(await getDocs(query(collection(db,`posts/${classID}/Post`), orderBy("date", "desc"))))
+            setPosts(await getDocs(query(collection(db,`Classes/${classID}/Post`), orderBy("date", "desc"))))
         }
         catch(error){
             console.log("getPosts Error: " + error)
@@ -32,10 +34,19 @@ export const GetPosts = ({classID}) => {
 
     const getLectures = async () => {
         try{
-            await setLectures(await getDocs(query(collection(db, `posts/${classID}/Lecture`), orderBy("date", "desc"))))
+            setLectures(await getDocs(query(collection(db, `Classes/${classID}/Lecture`), orderBy("date", "desc"))))
         }
         catch(error){
             console.log("getLectures Error: " + error)
+        }
+    }
+
+    const getQuizzes = async () => {
+        try{
+            setQuizzes(await getDocs(query(collection(db, `Classes/${classID}/Quizzes`), orderBy("date", "desc"))))
+        }
+        catch(error){
+            console.log("getQuizzes Error: " + error)
         }
     }
     
@@ -80,6 +91,19 @@ export const GetPosts = ({classID}) => {
             }
         }))
         setLecturesDocs(lectureMap)
+
+        const quizMap = quizzes.docs.map(((elements) => {
+            return{
+                title: elements.data().title,
+                description: elements.data().description,
+                questions: elements.data().questions,
+                date:  new Date(elements.data().date.seconds * 1000 + elements.data().date.nanoseconds / 1000000),
+                id: elements.id,
+                expanded: false
+
+            }
+        }))
+        setQuizzesDocs(quizMap)
     
     }
 
@@ -91,6 +115,7 @@ export const GetPosts = ({classID}) => {
         await getAnnouncements();
         await getPosts();
         await getLectures();
+        await getQuizzes();
     }
 
     useEffect(()=> {
@@ -98,16 +123,17 @@ export const GetPosts = ({classID}) => {
 }, [])
 
     useEffect(() => {
-        if(announcements && posts && lectures){
+        if(announcements && posts && lectures && quizzes){
             setDatas()
         }
-    }, [announcements, posts, lectures])
+    }, [announcements, posts, lectures, quizzes])
 
 
 
   return {
     announcementsDocs,
     postsDocs,
-    lecturesDocs
+    lecturesDocs,
+    quizzesDocs,
   }
 }

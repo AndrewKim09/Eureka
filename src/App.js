@@ -13,10 +13,15 @@ import {useAuthState }from 'react-firebase-hooks/auth';
 import { EmailVerify } from './components/EmailVerify';
 import { query, where } from 'firebase/firestore';
 import { getDocs, collection } from 'firebase/firestore';
-import { Create } from './components/Create';
 import { CreateTest } from './components/TestComponents/CreateTest';
-import {Class} from './components/Class';
+import {Class} from './components/ClassComponents/Class';
 import { AddAssignment } from './components/AddAssignment';
+import { QuizDetails } from './components/ClassComponents/QuizDetails';
+import { StudentList } from './components/ClassComponents/StudentList';
+import { AddStudent } from './components/ClassComponents/AddStudent';
+import { CheckAnswersTeacher } from './components/ClassComponents/CheckAnswersTeacher';
+import { StudentAnswer } from './components/ClassComponents/StudentAnswer';
+import { StudentReview } from './components/ClassComponents/StudentReview';
 
 export const userContext = React.createContext();
 
@@ -24,7 +29,6 @@ function App() {
   const [emailPassword, setEmailPassword] = useState([]);
   const [username] = useAuthState(auth);
   const [signedIn, setSignedIn] = useState(false);
-  const [userType, setUserType] = useState(null);
   const [userQuerySnapshot, setUserQuerySnapshot] = useState(null);
 
   const getQuery = async (email) => {
@@ -45,7 +49,6 @@ function App() {
         
       }
       else{
-        setUserType(null);
         return( await getDocs(query(collection(db, "users"), where("email", "==", username.email))));
       }
     }
@@ -66,7 +69,8 @@ function App() {
     <div className="z-0 App">
       <userContext.Provider value = {{getQuery, signedIn, setSignedIn, userQuerySnapshot, username}}>
         <Router>
-          <NavBar userType = {userType}/>
+          <div class = "h-14">&nbsp;</div>
+          <NavBar/>
           <Routes>
             
         
@@ -78,6 +82,12 @@ function App() {
             <Route path = "/create" element={<CreateTest/>}/>
             <Route path = "/class/:classID/add" element={<AddAssignment/>}/>
             <Route path = "/class/:classID" element={<Class userQuerySnapshot= {userQuerySnapshot}/>}/>
+            <Route path = "/class/:classID/quiz/:quizID" element={<QuizDetails/>}/>
+            <Route path = "/class/:classID/studentList" element = {<StudentList/>}/>
+            <Route path = "/class/:classID/studentList/addStudent" element = {<AddStudent/>}/>
+            <Route path = "/class/:classID/quiz/:quizID/answers" element={<CheckAnswersTeacher/>}/>
+            <Route path = "/class/:classID/quiz/:quizID/answers/:studentID" element={<StudentAnswer/>}/>
+            <Route path = "/class/:classID/quiz/:quizID/answer/:studentAnswerID" element={<StudentReview/>}/>
             <Route path = "*" element={<Error/>}/>
           </Routes>
         </Router>

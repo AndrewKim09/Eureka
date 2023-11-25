@@ -110,7 +110,7 @@ export const SignUp = ({setEmailPassword}) => {
         { !verifying ? 
             <div class = "flex flex-col border w-[600px] m-auto border-black my-[50px] shadow-xl rounded-md bg-[#d1fae5] h-[700px]">
 
-            <div class = "flex flex-col items-center mx-auto border border-b-[#47cc90] h-[70%] w-[100%] pb-5">
+            <div class = "flex flex-col items-center mx-auto border border-b-[#47cc90] h-[auto] w-[100%] pb-5">
                 <div class = "flex flex-col mt-6 w-[70%]">
                     <div class = "flex">
                         <label class = "font-bold" id = "email">Email</label>

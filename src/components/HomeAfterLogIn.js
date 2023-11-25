@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from './firebase';
 import { getDocs, collection, query, where } from 'firebase/firestore';
+import { set } from 'react-hook-form';
 
 
 
@@ -14,6 +15,7 @@ import { getDocs, collection, query, where } from 'firebase/firestore';
 
 
 export const HomeAfterLogIn = () => {
+
   const {getQuery} = React.useContext(userContext); 
   const [userQuerySnapshot, setUserQuerySnapshot] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,6 +24,7 @@ export const HomeAfterLogIn = () => {
   const [classes , setClasses] = useState(null);
   const [classesLoaded, setClassesLoaded] = useState(false);
   const [classesData, setClassesData] = useState(null);
+  const [typeOfUser, setTypeOfUser] = useState("Student");
   
 
   const navigate = useNavigate();
@@ -44,11 +47,32 @@ export const HomeAfterLogIn = () => {
   useEffect(() => {
     try{
       const fetchData = async () => {
-        setClasses(await getDocs(query(collection(db, "Classes"), where("email", "==", username.email))))
+        const teacherQuerySnapshot = await getDocs(query(collection(db, "Teachers"), where("email", "==", username.email)));
+        if(teacherQuerySnapshot.size == 1){
+          setClasses(await getDocs(query(collection(db, "Classes"), where("email", "==", username.email))))
+          setTypeOfUser("Teacher");
+        }
+        else{
+          const classesSnapshot = await getDocs(collection(db, "Classes"));
+
+          classesSnapshot.forEach(async (doc) => {
+            const studentsCollectionRef = collection(doc.ref, "Students");
+            const studentDocs = await getDocs(query(studentsCollectionRef, where("email", "==", username.email)));
+            console.log(studentDocs)
+
+            if(studentDocs.size == 1){
+              console.log(doc.data().className);
+              setClasses(await getDocs(query(collection(db, "Classes"), where("className", "==", doc.data().className))));
+            }
+
+          });
+        }
         await getData(); // Wait for getQuery to finish
         setClassesLoaded(true);
 
       };
+
+      
 
         fetchData();
         
@@ -72,6 +96,7 @@ export const HomeAfterLogIn = () => {
   }, [userQuerySnapshot]);
 
   useEffect(() => {
+    console.log(classes)
       if(classes != null){
         const newData = classes.docs.map(element => ({
           id: element.id,
@@ -98,18 +123,15 @@ export const HomeAfterLogIn = () => {
     <>
     {loading ? <div>Loading...</div> :
     <div id = "HomePage">
-          {userData && userData.typeOfUser == "Student" ?
-          
-          <div>Student</div> : 
 
           <div>
             <div class = "flex justify-end px-5">
-              <button class = "border-none font-bold" onClick={onCreateClick}> <FontAwesomeIcon size = "1x" color = "green" icon={faPlus} />  Create New Class</button>
+              {typeOfUser == "Teacher" ? <button class = "border-none font-bold" onClick={onCreateClick}> <FontAwesomeIcon size = "1x" color = "green" icon={faPlus} />  Create New Class</button> : <div>&nbsp;</div>}
             </div>
             <div class = "text-xl font-bold px-5">Classes</div>
             <div class = "flex justify-center">             
-              <div id = "classes" class = " grid grid-cols-3 gap-4 mt-5 h-[100%] w-[80%] justify-self-center grid-rows-3">
-                {classesData.map((element) => (
+              <div id = "classes" class = " grid grid-cols-3 gap-4 mt-5 min-h-[800px] h-[100%] w-[80%] justify-self-center grid-rows-3">
+                {classesData && classesData.map((element) => (
                     <div id="classBox" className="relative border-2 border-black rounded-md" onClick = {() => {onClassClick(element.id)}}>
                       <img class = "w-[100%] h-[40%] object-cover" src = {"" + element.image} />
                       <p class = "font-bold text-[1em]">{element.className}</p>
@@ -119,7 +141,6 @@ export const HomeAfterLogIn = () => {
               </div>
           </div>
           </div>
-          }
     </div>
 }
     </>

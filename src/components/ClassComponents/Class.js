@@ -1,33 +1,32 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { userContext } from '../App';
+import { userContext } from '../../App';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBackward,} from '@fortawesome/free-solid-svg-icons';
+import { getDocs, query, where } from 'firebase/firestore';
 
 
 // Firebase imports
-import { db, auth } from './firebase';
+import { db, auth } from '../firebase';
 import { addDoc, collection, } from 'firebase/firestore';
 import { ref, uploadBytes, getStorage, getDownloadURL, deleteObject } from 'firebase/storage';
 
 // Custom import
-import { GetPosts } from './getData/GetPosts';
-import {CreatePost} from './ClassComponents/CreatePost';
-import { ClassHomePage } from './ClassComponents/ClassHomePage';
-import { CreateQuiz } from './ClassComponents/CreateQuiz';
+import { GetPosts } from '../getData/GetPosts';
+import {CreatePost} from './CreatePost';
+import { ClassHomePage } from './ClassHomePage';
+import { CreateQuiz } from './CreateQuiz';
 
 
 export const Class = () => {
-    const [update ,setUpdate] = useState(false);
+    const [userType, setUserType] = useState("Student")
     const {classID} = useParams();
     const {getQuery} = React.useContext(userContext);
     const [userQuerySnapshot, setUserQuerySnapshot] = useState(null);
     const [username] = useAuthState(auth)
     const [loading, setLoading] = useState(true);
     const [userData, setUserData] = useState(null);
-    const navigate = useNavigate();
     const [createState, setCreateState] = useState(false);
     const[classesLoaded, setClassesLoaded] = useState(false)
     //----INPUT------//
@@ -42,19 +41,15 @@ export const Class = () => {
     const [descriptionError, setDescriptionError] = useState("");
     const [typeError, setTypeError] = useState("");
     //----DATA------//
-    const {announcementsDocs, postsDocs, lecturesDocs} = GetPosts({classID}); 
+    const {announcementsDocs, postsDocs, lecturesDocs, quizzesDocs} = GetPosts({classID}); 
     //----------------------------------VARIABLES----------------------------------//
-    const [quizNumber, quizNumberSet] = useState(1);
-    const [numberOfChoices, setNumberOfChoices] = useState(0);
-    const multipleChoice = []
 
     //----FUNCTIONS-----//
 
     const storage = getStorage();
 
-    const addChoiceBox = () => {
-      setNumberOfChoices(numberOfChoices + 1)
-    }
+    
+
     const onCreateClick = () => {
       if(createState){
           window.location.reload();
@@ -124,15 +119,17 @@ export const Class = () => {
             uploadBytes(ref(storage, 'posts/files/' + file[0].name), file[0])
               .then(async (storageRef) => {
                 const fileURL = await getDownloadURL(storageRef.ref)
-                addDoc(collection(db, `/posts/${classID}/${type}`), {
+                addDoc(collection(db, `Classes/${classID}/${type}`), {
                   title,
                   description,
                   fileName: file[0].name,
                   file: fileURL,
                   type,
                   date: new Date(),
-                })
-                console.log("Uploaded")
+                }).finally(() => {
+                  console.log("Uploaded")
+                  window.location.reload();
+                  })
                 
               })
           }
@@ -141,14 +138,15 @@ export const Class = () => {
           }
         }
         else{
-          addDoc(collection(db, `/posts/${classID}/${type}`), {
+          addDoc(collection(db, `Classes/${classID}/${type}`), {
             title,
             description,
             type,
             date: new Date(),
-          })
+          }).finally(() => {
           console.log("Uploaded")
-          navigate(`/class/${classID}`)
+          window.location.reload();
+          })
         }
   
        
@@ -206,6 +204,21 @@ export const Class = () => {
           setClassesLoaded(true);
         }
       }, [announcementsDocs]);
+
+      useEffect(() => { 
+        const checkTypeOfUser = async () => {
+          const teacherQuerySnapshot = await getDocs(query(collection(db, "Teachers"), where("email", "==", username.email)));
+          if(teacherQuerySnapshot.size == 1){
+            setUserType("Teacher")
+            
+          }else{
+            setUserType("Student")
+            
+          }
+        }
+    
+        checkTypeOfUser();
+      }, [])
       
 
       
@@ -214,18 +227,16 @@ export const Class = () => {
         <div class="w-full h-full">
           {loading ? (
             <div>Loading</div>
-          ) : userData.typeOfUser === "student" ? (
-            <div>Student</div>
           ) : (
             /*---------------------INSTRUCTOR---------------------*/
             createState == false ? (
-              <ClassHomePage classesLoaded={classesLoaded} setCreateState={setCreateState} createState={createState} db={db} storage={storage} announcementsDocs={announcementsDocs} postsDocs={postsDocs} lecturesDocs={lecturesDocs}/>
+              <ClassHomePage userType={userType} classesLoaded={classesLoaded} setCreateState={setCreateState} createState={createState} db={db} storage={storage} announcementsDocs={announcementsDocs} postsDocs={postsDocs} lecturesDocs={lecturesDocs} quizzesDocs={quizzesDocs}/>
             ) : (
               /*---------------------CREATE---------------------*/
-              <div class="flex-row h-[1000px]">
+              <div class="flex-row">
                 <div class="w-full h-full">
                   <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-full ml-auto m-2 h-[25px] w-[70px] text-sm" onClick={() => onCreateClick()}><FontAwesomeIcon icon = {faBackward}/> back </button>
-                  <div class="border-2 border-solid border-gray-200 h-[80%] w-[1000px] m-auto">
+                  <div class="border-2 border-solid border-gray-200  w-[1000px] m-auto min-h-[500px] h-auto pb-[60px] mb-[60px]">
                     <label for = "type" class = "p-0 m-2">
                       <p>Type of post</p>
                     <select id = "type" class = "border-solid border-black border-2" onChange={(event) => {onTypeChange(event)}}>
@@ -245,7 +256,7 @@ export const Class = () => {
                       type === "Quiz" ? 
                       /*---------------------Quiz---------------------*/
 
-                      <CreateQuiz titleError = {titleError} setTitle = {setTitle} descriptionError = {descriptionError} setDescription={setDescription}/>
+                      <CreateQuiz titleError = {titleError} setTitle = {setTitle} descriptionError = {descriptionError} setDescription={setDescription} title = {title} description={description}/>
                       :
                       /*---------------------Announcement, Post, Lecture---------------------*/
                       <CreatePost onSubmit = {onSubmit} titleError={titleError} setTitle={setTitle} setDescription={setDescription} setFile={setFile} descriptionError={descriptionError} setTypeError={setTypeError}/>

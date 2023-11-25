@@ -1,12 +1,4 @@
 import React from 'react'
-import { useState} from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import { uploadBytes } from 'firebase/storage';
-import {ref, getDownloadURL} from 'firebase/storage';
-import {addDoc, collection} from 'firebase/firestore';
-import { useParams } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
 
 
 export const CreatePost = ({titleError, setTitle, setDescription, setFile, descriptionError, onSubmit}) => {
