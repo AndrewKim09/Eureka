@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/Eureka/static/css/main.b3f52a3f.css",
+    "main.js": "/Eureka/static/js/main.ab44c86b.js",
+    "index.html": "/Eureka/index.html",
+    "main.b3f52a3f.css.map": "/Eureka/static/css/main.b3f52a3f.css.map",
+    "main.ab44c86b.js.map": "/Eureka/static/js/main.ab44c86b.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b3f52a3f.css",
+    "static/js/main.ab44c86b.js"
+  ]
+}
