@@ -6,10 +6,9 @@
   color-scheme: light dark;
 }
 
-html, body {
+#root, html, body {
   background-color: "#e0ffff";
   height: 100%;
-  height: auto;
   width: auto
 }
 

@@ -19,6 +19,13 @@ export const Login = ({setEmailPassword}) => {
   const [emailError, setEmailError] = useState("");
   const[ userQuerySnapshot, setUserQuerySnapshot] = useState(null);
 
+  const enter = (event) => {
+    console.log(event.key);
+    if (event.key === 'Enter') {
+      onSignIn();
+    }
+  }
+
   
   const checkData = async (email) => {
     try {
@@ -119,7 +126,7 @@ export const Login = ({setEmailPassword}) => {
             <p class = "ml-6 text-red-700">{emailError}</p>
         </div>
         
-        <input class = "px-4 py-1 rounded-xl" placeholder='Email' onChange={(e) => {setEmail(e.target.value)}}></input>
+        <input class = "px-4 py-1 rounded-xl" placeholder='Email' onKeyDown={enter} onChange={(e) => {setEmail(e.target.value); setEmailError("")}}></input>
     </div>
 
 
@@ -129,7 +136,7 @@ export const Login = ({setEmailPassword}) => {
             <p class = "ml-6 text-red-700">{passwordError}</p>
         </div>
         
-        <input class = "px-4 py-1 rounded-xl"  id = "passwordInput" placeholder='Password' type = "password" onChange={(e) => {setPassword(e.target.value)}}></input>
+        <input class = "px-4 py-1 rounded-xl"  id = "passwordInput" placeholder='Password' type = "password" onKeyDown={enter} onChange={(e) => {setPassword(e.target.value); setPasswordError("")}}></input>
         <div class = "flex align-middle justify-center text-center" onClick={(event) => {toggleVisible(event)}}>
           <input type="checkbox" id = "checkBox" ></input>
           <label class = "justify-centre p-0">Show Password</label>
