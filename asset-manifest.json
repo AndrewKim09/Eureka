@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/Eureka/static/css/main.b3f52a3f.css",
-    "main.js": "/Eureka/static/js/main.ab44c86b.js",
+    "main.css": "/Eureka/static/css/main.7b6c1dda.css",
+    "main.js": "/Eureka/static/js/main.9a1fd995.js",
     "index.html": "/Eureka/index.html",
-    "main.b3f52a3f.css.map": "/Eureka/static/css/main.b3f52a3f.css.map",
-    "main.ab44c86b.js.map": "/Eureka/static/js/main.ab44c86b.js.map"
+    "main.7b6c1dda.css.map": "/Eureka/static/css/main.7b6c1dda.css.map",
+    "main.9a1fd995.js.map": "/Eureka/static/js/main.9a1fd995.js.map"
   },
   "entrypoints": [
-    "static/css/main.b3f52a3f.css",
-    "static/js/main.ab44c86b.js"
+    "static/css/main.7b6c1dda.css",
+    "static/js/main.9a1fd995.js"
   ]
 }
